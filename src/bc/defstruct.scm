@@ -82,6 +82,7 @@
              (concatenate
               (map (lambda (pair) (list (car pair) (cdr pair))) lst))))))
 
+;(define expand-defstruct (let () ; debug
 (define-syntax defstruct
   (er-macro-transformer
    (lambda (exp rename compare)
