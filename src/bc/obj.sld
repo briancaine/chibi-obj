@@ -1,0 +1,5 @@
+(define-library (bc obj)
+  (import (chibi)
+          (bc chicken-misc)
+          (bc defstruct))
+  (include "obj.scm"))
