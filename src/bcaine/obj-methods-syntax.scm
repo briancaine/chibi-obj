@@ -1,27 +1,3 @@
-(define (valid-wrapped-generic-procedure? x)
-  (and (wrapped-generic-procedure? x)
-       (valid-generic-procedure? (wrapped-generic-procedure-proc x))))
-
-(define-syntax handle-exceptions
-  (syntax-rules ()
-    ((handle-exceptions exn handler body ...)
-     (call/cc
-      (lambda (ret)
-        (with-exception-handler
-         (lambda (exn) (ret handler))
-         (lambda () body ...)))))))
-
-(define (valid-generic-procedure? x)
-  (and (generic-procedure? x)
-       (handle-exceptions
-        exn #f
-        (generic-procedure-typed-arg-count x)
-        #t)))
-
-(define (make-wrapped-generic-procedure name arg-count)
-  (wrap-generic-procedure
-   (make-generic-procedure 'name name 'typed-arg-count arg-count)))
-
 (define-syntax define-method
   (er-macro-transformer
    (lambda (def rename compare)

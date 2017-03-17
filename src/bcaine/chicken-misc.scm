@@ -50,3 +50,12 @@
 
 (define (void? x)
   (eq? x (void)))
+
+(define-syntax handle-exceptions
+  (syntax-rules ()
+    ((handle-exceptions exn handler body ...)
+     (call/cc
+      (lambda (ret)
+        (with-exception-handler
+         (lambda (exn) (ret handler))
+         (lambda () body ...)))))))

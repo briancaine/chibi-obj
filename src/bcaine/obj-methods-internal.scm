@@ -205,14 +205,30 @@
 ;; wrapped generic procedures
 ;; =============================================================================
 
-(define *generic-procedures* (make-hash-table eq? hash-by-identity))
+(define *name->proc* (make-hash-table equal? hash))
+(define *wrapped->name* (make-hash-table eq? hash-by-identity))
+
+(define (add-generic-procedure! name proc)
+  (hash-table-set! *name->proc* proc))
+
+(define (generic-procedure-by-name name)
+  (hash-table-ref/default *name->proc* name #f))
+
+(define (add-wrapped-generic-procedure! wrapped name)
+  (hash-table-set! *wrapped->name* wrapped name))
+
+(define (name-by-wrapped-generic-procedure wrapped)
+  (hash-table-ref/default *wrapped->name* wrapped #f))
 
 (define (wrapped-generic-procedure-proc func)
-  (hash-table-ref *generic-procedures* func))
+  (and-let* ((name (name-by-wrapped-generic-procedure func))
+             (proc (generic-procedure-by-name name)))
+    proc))
 
 (define (wrap-generic-procedure proc)
   (let ((res (lambda args (apply-generic-procedure proc args))))
-    (hash-table-set! *generic-procedures* res proc)
+    (add-generic-procedure! (generic-procedure-name proc) proc)
+    (add-wrapped-generic-procedure res (generic-procedure-name proc))
     res))
 
 (define (qualifier-getter qualifier)
@@ -253,3 +269,27 @@
              `(,(car pair) . ,(map method->alist (cdr pair)))
              pair))
        (generic-procedure->alist (wrapped-generic-procedure-proc proc))))
+
+(define (valid-wrapped-generic-procedure? x)
+  (and (wrapped-generic-procedure? x)
+       (valid-generic-procedure? (wrapped-generic-procedure-proc x))))
+
+(define-syntax handle-exceptions
+  (syntax-rules ()
+    ((handle-exceptions exn handler body ...)
+     (call/cc
+      (lambda (ret)
+        (with-exception-handler
+         (lambda (exn) (ret handler))
+         (lambda () body ...)))))))
+
+(define (valid-generic-procedure? x)
+  (and (generic-procedure? x)
+       (handle-exceptions
+        exn #f
+        (generic-procedure-typed-arg-count x)
+        #t)))
+
+(define (make-wrapped-generic-procedure name arg-count)
+  (wrap-generic-procedure
+   (make-generic-procedure 'name name 'typed-arg-count arg-count)))
