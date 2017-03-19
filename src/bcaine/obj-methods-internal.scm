@@ -208,6 +208,10 @@
 (define *name->proc* (make-hash-table equal? hash))
 (define *wrapped->name* (make-hash-table eq? hash-by-identity))
 
+(define (wipe-all-methods!)
+  (set! *name->proc* (make-hash-table equal? hash))
+  (set! *wrapped->name* (make-hash-table eq? hash-by-identity)))
+
 (define (add-generic-procedure! name proc)
   (hash-table-set! *name->proc* proc))
 
@@ -254,7 +258,8 @@
         ((same-matching-method? method (car existing))
          (append front (cdr existing) (list method)))
         (else
-         (iter (cdr existing) (cons (car existing) front) #f)))))))
+         (iter (cdr existing) (cons (car existing) front) #f)))))
+    func))
 
 (define (wrapped-generic-procedure? proc)
   (and (procedure? proc)
@@ -293,3 +298,8 @@
 (define (make-wrapped-generic-procedure name arg-count)
   (wrap-generic-procedure
    (make-generic-procedure 'name name 'typed-arg-count arg-count)))
+
+(define (ensure-wrapped-generic-procedure name arg-count)
+  (or (and-let* ((proc (generic-procedure-by-name name)))
+        (wrap-generic-procedure proc))
+      (make-wrapped-generic-procedure name arg-count)))

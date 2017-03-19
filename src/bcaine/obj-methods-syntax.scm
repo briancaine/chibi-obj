@@ -35,13 +35,15 @@
 
      ;; =>
 
-     ;; (update-wrapped-proc!
-     ;;  foo
-     ;;  'qualifier
-     ;;  (make-method
-     ;;   'arg-count '(+ 3)
-     ;;   'arg-classes (list typea typeb)
-     ;;   'func (lambda (arg1 arg2 arg3 . arg4) body ...)
+     ;; (define foo
+     ;;   (update-wrapped-proc!
+     ;;    (ensure-wrapped-generic-procedure 'foo '(+ 3))
+     ;;    'qualifier
+     ;;    (make-method
+     ;;     'arg-count '(+ 3)
+     ;;     'arg-classes (list typea typeb)
+     ;;     'func (lambda (arg1 arg2 arg3 . arg4) body ...)
+     ;;    )
      ;;  )
      ;; )
 
@@ -55,7 +57,7 @@
      ;; =>
 
      ;; (update-wrapped-proc!
-     ;;  (setter foo)
+     ;;  (ensure-wrapped-generic-procedure '(setter foo) '(+ 3))
      ;;  'qualifier
      ;;  (make-method
      ;;   'arg-count '(+ 3)
@@ -124,17 +126,26 @@
             (r-temp (rename 'temp))
             (r-make-method (rename 'make-method))
             )
-       `(,r-update-wrapped-proc!
-         ,method-name
-         (,r-quote ,qualifier)
-         (,r-make-method
-          (,r-quote arg-count) (,r-quote ,arg-count)
-          (,r-quote arg-classes) ,(cons r-list arg-classes)
-          (,r-quote func) (,r-lambda ,lambda-args . ,body-list)))))))
+       (if (symbol? method-name)
+           `(,r-define ,method-name
+             (,r-update-wrapped-proc!
+              ,method-name
+              (,r-quote ,qualifier)
+              (,r-make-method
+               (,r-quote arg-count) (,r-quote ,arg-count)
+               (,r-quote arg-classes) ,(cons r-list arg-classes)
+               (,r-quote func) (,r-lambda ,lambda-args . ,body-list))))
+           `(,r-update-wrapped-proc!
+             ,method-name
+             (,r-quote ,qualifier)
+             (,r-make-method
+              (,r-quote arg-count) (,r-quote ,arg-count)
+              (,r-quote arg-classes) ,(cons r-list arg-classes)
+              (,r-quote func) (,r-lambda ,lambda-args . ,body-list))))))))
 ;; we want:
 ;; (define-generic name a b c)
 ;;
-;; (define name (make-wrapped-generic-procedure 'name (syntax-length . rest)))
+;; (define name (ensure-wrapped-generic-procedure 'name (syntax-length . rest)))
 
 (define-syntax syntax-length
   (syntax-rules ()
@@ -147,8 +158,8 @@
   (syntax-rules ()
     ((define-generic ((setter name) . rest))
      (set! (setter name)
-           (make-wrapped-generic-procedure
+           (ensure-wrapped-generic-procedure
             '(setter name) (syntax-length . rest))))
     ((define-generic (name . rest))
      (define name
-       (make-wrapped-generic-procedure 'name (syntax-length . rest))))))
+       (ensure-wrapped-generic-procedure 'name (syntax-length . rest))))))

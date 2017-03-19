@@ -9,4 +9,14 @@
   (include "obj-methods-syntax.scm")
   (include "obj-classes.scm")
   (include "obj-default-classes.scm")
-)
+  (export wipe-all-methods!
+          define-generic
+          define-method
+          define-class
+          define-primitive-class
+          <number> <string> <symbol> <vector> <pair> <null>
+          <class> <instance>
+          <primitive-value> <primitive-class>
+          make initialize allocate
+          o-slot-ref o-slot-set!
+))
