@@ -34,7 +34,8 @@
 
 (define *primitive-classes* '())
 
-(define (add-primitive-class! predicate class)
+(define (add-primitive-class! predicate allocator class)
+  (set! (class-int-allocator class) (or allocator (class-int-allocator class)))
   (set! *primitive-classes*
         (cons (cons predicate class) *primitive-classes*)))
 
@@ -48,7 +49,16 @@
 (defstruct class
   int-name
   int-inheritance-chain
-  int-slot-prototypes)
+  int-slot-prototypes
+
+  ;; primitive class stuff
+  (int-allocator basic-class-allocator)
+)
+
+(define (basic-class-allocator class)
+  (make-instance
+   'class class
+   'slots (map slot-prototype->slot (class-int-slot-prototypes class))))
 
 (define <class> (make-class 'int-name '<class>
                             'int-inheritance-chain '()
@@ -56,7 +66,7 @@
 
 (set! (class-int-inheritance-chain <class>) (list <class> #t))
 
-(add-primitive-class! class? <class>)
+(add-primitive-class! class? #f <class>)
 
 (set! class-inheritance-chain
       (let ((old-class-inheritance-chain class-inheritance-chain))
@@ -203,9 +213,7 @@
   (cons (slot-prototype-name sp) +uninitialized+))
 
 (define-method (allocate (class <class>))
-  (make-instance 'class class
-                 'slots (map slot-prototype->slot
-                             (class-int-slot-prototypes class))))
+  ((class-int-allocator class) class))
 
 (define-method (initialize (obj <instance>) . args)
   (for-each
@@ -416,7 +424,7 @@
                           def msg)))
               args))
 
-     ;; (define-primitive-class class (superclass-a) metaclass: mclass predicate)
+     ;; (define-primitive-class class (superclass-a) metaclass: mclass predicate: predicate allocator: allocator)
 
      ;; =>
 
@@ -425,7 +433,7 @@
      ;;   (add-primitive-class! predicate class)
      ;; )
 
-     ;; class defaults to <primitive-class>
+     ;; mclass defaults to <primitive-class>
 
      (let* (
             (class-name (or (and (>= (length def) 2) (cadr def))
@@ -440,19 +448,22 @@
             (_ (unless (pair? post-superclasses)
                        (bail-with-error "Missing predicate")))
 
-            (metaclass (if (eq? (car post-superclasses) 'metaclass:)
-                           (or (and (pair? (cdr post-superclasses))
-                                    (cadr post-superclasses))
-                               (bail-with-error "Missing metaclass"))
-                           '<primitive-class>))
-            (post-metaclass
-             (if (eq? (car post-superclasses) 'metaclass:)
-                 (cddr post-superclasses)
-                 post-superclasses))
+            (pair-args (chop post-superclasses 2))
 
-            (predicate (or (and (pair? post-metaclass)
-                                (car post-metaclass))
-                           (bail-with-error "Missing predicate")))
+            (metaclass
+             (or (and-let* ((entry (alist-ref 'metaclass: pair-args))
+                            (_ (= (length entry) 1)))
+                   (car entry))
+                 '<primitive-class>))
+            (predicate
+             (or (and-let* ((entry (alist-ref 'predicate: pair-args))
+                            (_ (= (length entry) 1)))
+                   (car entry))
+                 (error "Missing predicate")))
+            (allocator
+             (and-let* ((entry (alist-ref 'allocator: pair-args))
+                        (_ (= (length entry) 1)))
+               (car entry)))
 
             ;; redefs
             (r-begin               (rename 'begin))
@@ -461,4 +472,4 @@
             )
        `(,r-begin
          (,r-define-class ,class-name ,superclasses metaclass: ,metaclass)
-         (,r-add-primitive-class! ,predicate ,class-name))))))
+         (,r-add-primitive-class! ,predicate ,allocator ,class-name))))))
