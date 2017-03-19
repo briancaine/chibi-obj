@@ -84,6 +84,7 @@
                             (equal? (car method-name) 'setter)))
                    (bail-with-error "Bad method-name")))
             (setter? (list? method-name))
+            (getter-name-for-setter (and setter? (cadr method-name)))
 
             (has-qualifier?
              (and (pair? (cdr spec)) (symbol? (cadr spec))
@@ -116,8 +117,11 @@
             ;; renamed symbols
             (r-define (rename 'define))
             (r-set! (rename 'set!))
+            (r-setter (rename 'setter))
             (r-ensure-generic-variable (rename 'ensure-generic-variable))
             (r-ensure-generic-procedure (rename 'ensure-generic-procedure))
+            (r-ensure-wrapped-generic-procedure
+             (rename 'ensure-wrapped-generic-procedure))
             (r-quote (rename 'quote))
             (r-update-wrapped-proc! (rename 'update-wrapped-proc!))
             (r-list (rename 'list))
@@ -125,23 +129,21 @@
             (r-begin (rename 'begin))
             (r-temp (rename 'temp))
             (r-make-method (rename 'make-method))
+
+            (update-wrapped-proc-expansion
+             `(,r-update-wrapped-proc!
+               (,r-ensure-wrapped-generic-procedure
+                (,r-quote ,method-name) (,r-quote ,arg-count))
+               (,r-quote ,qualifier)
+               (,r-make-method
+                (,r-quote arg-count) (,r-quote ,arg-count)
+                (,r-quote arg-classes) ,(cons r-list arg-classes)
+                (,r-quote func) (,r-lambda ,lambda-args . ,body-list))))
             )
-       (if (symbol? method-name)
-           `(,r-define ,method-name
-             (,r-update-wrapped-proc!
-              ,method-name
-              (,r-quote ,qualifier)
-              (,r-make-method
-               (,r-quote arg-count) (,r-quote ,arg-count)
-               (,r-quote arg-classes) ,(cons r-list arg-classes)
-               (,r-quote func) (,r-lambda ,lambda-args . ,body-list))))
-           `(,r-update-wrapped-proc!
-             ,method-name
-             (,r-quote ,qualifier)
-             (,r-make-method
-              (,r-quote arg-count) (,r-quote ,arg-count)
-              (,r-quote arg-classes) ,(cons r-list arg-classes)
-              (,r-quote func) (,r-lambda ,lambda-args . ,body-list))))))))
+       (if setter?
+           `(,r-set! (,r-setter ,getter-name-for-setter)
+                     ,update-wrapped-proc-expansion)
+           `(,r-define ,method-name ,update-wrapped-proc-expansion))))))
 ;; we want:
 ;; (define-generic name a b c)
 ;;

@@ -213,7 +213,7 @@
   (set! *wrapped->name* (make-hash-table eq? hash-by-identity)))
 
 (define (add-generic-procedure! name proc)
-  (hash-table-set! *name->proc* proc))
+  (hash-table-set! *name->proc* name proc))
 
 (define (generic-procedure-by-name name)
   (hash-table-ref/default *name->proc* name #f))
@@ -232,7 +232,7 @@
 (define (wrap-generic-procedure proc)
   (let ((res (lambda args (apply-generic-procedure proc args))))
     (add-generic-procedure! (generic-procedure-name proc) proc)
-    (add-wrapped-generic-procedure res (generic-procedure-name proc))
+    (add-wrapped-generic-procedure! res (generic-procedure-name proc))
     res))
 
 (define (qualifier-getter qualifier)
