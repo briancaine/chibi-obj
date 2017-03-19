@@ -1,10 +1,21 @@
 all : package
 
-package : src/bcaine/defstruct.sld src/bcaine/chicken-misc.sld src/bcaine/format.sld src/bcaine/obj.sld src/bcaine/format.scm src/bcaine/chicken-misc.scm src/bcaine/defstruct.scm src/bcaine/obj-methods-internal.scm src/bcaine/obj-methods-syntax.scm src/bcaine/obj-classes.scm src/bcaine/obj-default-classes.scm
-	snow-chibi package --version=0.0.1 src/bcaine/defstruct.sld
+bcaine-chicken-misc-0.0.1.tgz : src/bcaine/chicken-misc.sld src/bcaine/chicken-misc.scm
 	snow-chibi package --version=0.0.1 src/bcaine/chicken-misc.sld
+
+bcaine-format-0.0.1.tgz : src/bcaine/format.sld src/bcaine/format.scm
 	snow-chibi package --version=0.0.1 src/bcaine/format.sld
+
+bcaine-sld-stub-expand-0.0.1.tgz : src/bcaine/sld-stub-expand.sld src/bcaine/sld-stub-expand.scm
+	snow-chibi package --version=0.0.1 src/bcaine/sld-stub-expand.sld
+
+bcaine-obj-0.0.1.tgz : src/bcaine/obj.sld src/bcaine/obj-classes.scm src/bcaine/obj-default-classes.scm src/bcaine/obj-methods-internal.scm src/bcaine/obj-methods-syntax.scm
 	snow-chibi package --version=0.0.1 src/bcaine/obj.sld
+
+bcaine-defstruct-0.0.1.tgz : src/bcaine/defstruct.sld src/bcaine/defstruct.scm
+	snow-chibi package --version=0.0.1 src/bcaine/defstruct.sld
+
+package : bcaine-chicken-misc-0.0.1.tgz bcaine-format-0.0.1.tgz bcaine-sld-stub-expand-0.0.1.tgz bcaine-obj-0.0.1.tgz bcaine-defstruct-0.0.1.tgz
 
 clean :
 	rm -f *.tgz

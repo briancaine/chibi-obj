@@ -8,6 +8,13 @@
   (parameterize ((current-output-port port))
     (func)))
 
+(define (with-input-from-port port func)
+  (parameterize ((current-input-port port))
+    (func)))
+
+(define (with-input-from-string str func)
+  (with-input-from-port (open-input-string str) func))
+
 (define (void) (if #f #f))
 
 (define (identity x) x)
@@ -59,3 +66,7 @@
         (with-exception-handler
          (lambda (exn) (ret handler))
          (lambda () body ...)))))))
+
+(define (pretty-print obj)
+  (show #t (pretty obj))
+  (void))
