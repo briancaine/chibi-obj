@@ -368,7 +368,7 @@
             (superclasses (or (and (>= (length def) 3)
                                    (caddr def))
                               (bail-with-error "Superclass list missing")))
-            (_ (or (and (list? superclasses) (every symbol? superclasses))
+            (_ (or (and (list? superclasses) (every identifier? superclasses))
                    (bail-with-error "Bad superclasses")))
 
             (post-superclasses (cdddr def))
@@ -430,7 +430,7 @@
 
      ;; (begin
      ;;   (define-class class (superclass-a) metaclass: mclass)
-     ;;   (add-primitive-class! predicate class)
+     ;;   (add-primitive-class! predicate allocator class)
      ;; )
 
      ;; mclass defaults to <primitive-class>
@@ -448,18 +448,25 @@
             (_ (unless (pair? post-superclasses)
                        (bail-with-error "Missing predicate")))
 
-            (pair-args (chop post-superclasses 2))
+            (pair-args
+             (map (lambda (pair)
+                    (if (identifier? (car pair))
+                        (cons (identifier->symbol (car pair)) (cdr pair))
+                        pair))
+                  (chop post-superclasses 2)))
 
             (metaclass
              (or (and-let* ((entry (alist-ref 'metaclass: pair-args))
                             (_ (= (length entry) 1)))
                    (car entry))
                  '<primitive-class>))
+
             (predicate
              (or (and-let* ((entry (alist-ref 'predicate: pair-args))
                             (_ (= (length entry) 1)))
                    (car entry))
                  (error "Missing predicate")))
+
             (allocator
              (and-let* ((entry (alist-ref 'allocator: pair-args))
                         (_ (= (length entry) 1)))
