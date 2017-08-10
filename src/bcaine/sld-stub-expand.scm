@@ -50,7 +50,12 @@
 
 (define (exports-tree tree)
   (match tree
+    (('c-link foo )   '())
     (('c-include foo) '())
+    (('import . rest) '())
+    (('define . rest) '())
+    (('set!   . rest) '())
+    (('c-flags-from-script str) '())
     (('begin . items)
      (concatenate (map exports-tree items)))
     (('define-c-const type const)
@@ -98,7 +103,7 @@
 
 (define (main args)
   (match args
-    ((_ input-file)
+    ((input-file)
      (expand-sld-file input-file))
     (_
      (printf "Bad args: ~s\n" args)
