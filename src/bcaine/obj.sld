@@ -1,6 +1,6 @@
 (define-library (bcaine obj)
   (import (chibi)
-          (bcaine defstruct) (bcaine format) (bcaine chicken-misc)
+          (bcaine defstruct) (bcaine format) (bcaine misc-util)
           (srfi 1) (srfi 2) (srfi 17) (srfi 39) (srfi 69)
           (chibi ast)
           (only (scheme base) call/cc when unless let-values)

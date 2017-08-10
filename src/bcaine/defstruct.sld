@@ -3,7 +3,7 @@
  (import (srfi 1))
  (import (srfi 17))
  (import (srfi 9))
- (import (bcaine chicken-misc))
+ (import (bcaine misc-util))
  (import (bcaine format))
  (include "defstruct.scm")
  (export defstruct))

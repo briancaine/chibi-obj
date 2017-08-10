@@ -1,7 +1,7 @@
 all : package
 
-bcaine-chicken-misc-0.0.1.tgz : src/bcaine/chicken-misc.sld src/bcaine/chicken-misc.scm
-	snow-chibi package --version=0.0.1 src/bcaine/chicken-misc.sld
+bcaine-misc-util-%.tgz : src/bcaine/misc-util.sld src/bcaine/misc-util.scm
+	snow-chibi package --version=`cat src/bcaine/misc-util.version` src/bcaine/misc-util.sld
 
 bcaine-format-0.0.1.tgz : src/bcaine/format.sld src/bcaine/format.scm
 	snow-chibi package --version=0.0.1 src/bcaine/format.sld
@@ -15,7 +15,7 @@ bcaine-obj-0.0.1.tgz : src/bcaine/obj.sld src/bcaine/obj-classes.scm src/bcaine/
 bcaine-defstruct-0.0.1.tgz : src/bcaine/defstruct.sld src/bcaine/defstruct.scm
 	snow-chibi package --version=0.0.1 src/bcaine/defstruct.sld
 
-package : bcaine-chicken-misc-0.0.1.tgz bcaine-format-0.0.1.tgz bcaine-sld-stub-expand-0.0.1.tgz bcaine-obj-0.0.1.tgz bcaine-defstruct-0.0.1.tgz
+package : bcaine-misc-util-%.tgz bcaine-format-0.0.1.tgz bcaine-sld-stub-expand-0.0.1.tgz bcaine-obj-0.0.1.tgz bcaine-defstruct-0.0.1.tgz
 
 clean :
 	rm -f *.tgz

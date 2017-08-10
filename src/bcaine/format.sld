@@ -3,6 +3,6 @@
  (import (only (scheme char) string-downcase))
  (import (chibi char-set) (chibi char-set full))
  (import (srfi 9) (srfi 6) (srfi 39))
- (import (bcaine chicken-misc))
+ (import (bcaine misc-util))
  (include "format.scm")
  (export format printf sprintf))
