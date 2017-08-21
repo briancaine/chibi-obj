@@ -1,7 +1,7 @@
 all : package
 
 bcaine-misc-util-%.tgz : src/bcaine/misc-util.sld src/bcaine/misc-util.scm
-	snow-chibi package --version=`cat src/bcaine/misc-util.version` src/bcaine/misc-util.sld
+	snow-chibi package --version=`cat src/bcaine/misc-util.version` --description="`cat src/bcaine/misc-util.desc`" src/bcaine/misc-util.sld
 
 bcaine-format-0.0.1.tgz : src/bcaine/format.sld src/bcaine/format.scm
 	snow-chibi package --version=0.0.1 src/bcaine/format.sld
