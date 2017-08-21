@@ -6,7 +6,7 @@
 )
 
 (define (with-output-to-string func)
-  (let ((port (open-output-string)))      
+  (let ((port (open-output-string)))
     (parameterize ((current-output-port port))
       (func)
       (get-output-string port))))
