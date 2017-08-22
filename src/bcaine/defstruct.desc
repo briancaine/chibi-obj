@@ -1,0 +1,1 @@
+A more convenient version of `define-record-type`, inspired by Chicken's `defstruct`, including SRFI-17 setters.

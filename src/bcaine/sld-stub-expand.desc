@@ -1,0 +1,1 @@
+Expands library declarations (`define-unprocessed-library` instead of `define-library`), and generates export statements for all the identifiers in .stub files.
