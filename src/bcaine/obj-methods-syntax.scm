@@ -1,3 +1,5 @@
+(import (chibi ast))
+
 (define-syntax define-method
   (er-macro-transformer
    (lambda (def rename compare)
@@ -80,9 +82,17 @@
             (_ (or (symbol? method-name)
                    (and (list? method-name)
                         (= (length method-name) 2)
-                        (or (equal? (car method-name) (rename 'setter))
-                            (equal? (car method-name) 'setter)))
+                        (or
+                         ;; todo: this equal? rename setter biz might be
+                         ;;       worthless
+                         (equal? (car method-name) (rename 'setter))
+                         (equal? (car method-name) 'setter)
+                         (and (syntactic-closure? (car method-name))
+                              (equal?
+                               (syntactic-closure-expr (car method-name))
+                               'setter))))
                    (bail-with-error "Bad method-name")))
+
             (setter? (list? method-name))
             (getter-name-for-setter (and setter? (cadr method-name)))
 
