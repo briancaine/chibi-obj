@@ -480,3 +480,12 @@
        `(,r-begin
          (,r-define-class ,class-name ,superclasses metaclass: ,metaclass)
          (,r-add-primitive-class! ,predicate ,allocator ,class-name))))))
+
+;; =============================================================================
+;; tests
+;; =============================================================================
+
+(import (chibi test))
+
+(define (test-obj-classes)
+  #f)

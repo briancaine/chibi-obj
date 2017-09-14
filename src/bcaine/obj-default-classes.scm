@@ -5,3 +5,11 @@
 (define-primitive-class <pair> () predicate: pair?)
 (define-primitive-class <null> () predicate: null?)
 
+;; =============================================================================
+;; tests
+;; =============================================================================
+
+(import (chibi test))
+
+(define (test-obj-default-classes)
+  #f)

@@ -22,5 +22,8 @@ bcaine-defstruct.placeholder : src/bcaine/defstruct.sld src/bcaine/defstruct.scm
 
 package : bcaine-misc-util.placeholder bcaine-format.placeholder bcaine-sld-stub-expand.placeholder bcaine-obj.placeholder bcaine-defstruct.placeholder
 
+test :
+	chibi-scheme -Isrc -Rbcaine.obj-test
+
 clean :
 	rm -f *.tgz *.placeholder

@@ -303,3 +303,12 @@
   (or (and-let* ((proc (generic-procedure-by-name name)))
         (wrap-generic-procedure proc))
       (make-wrapped-generic-procedure name arg-count)))
+
+;; =============================================================================
+;; tests
+;; =============================================================================
+
+(import (chibi test))
+
+(define (test-obj-methods-internal)
+  #f)

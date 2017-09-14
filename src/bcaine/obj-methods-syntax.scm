@@ -197,3 +197,12 @@
     ((define-generic (name . rest))
      (define name
        (ensure-wrapped-generic-procedure 'name (syntax-length . rest))))))
+
+;; =============================================================================
+;; tests
+;; =============================================================================
+
+(import (chibi test))
+
+(define (test-obj-methods-syntax)
+  #f)
