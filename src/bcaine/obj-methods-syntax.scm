@@ -160,11 +160,33 @@
 ;; (define name (ensure-wrapped-generic-procedure 'name (syntax-length . rest)))
 
 (define-syntax syntax-length
-  (syntax-rules ()
-    ((syntax-length)
-     0)
-    ((syntax-length a . rest)
-     (+ 1 (syntax-length . rest)))))
+  (er-macro-transformer
+   (lambda (def rename compare)
+
+     ;; (syntax-length)
+     ;; =>
+     ;; 0
+
+     ;; (syntax-length a b c)
+     ;; =>
+     ;; 3
+
+     ;; (syntax-length a b . c)
+     ;; =>
+     ;; (+ 2)
+
+     (let* ((_ (or (pair? def)
+                   (bail-with-error "bad syntax")))
+
+            (syntax-length (car def))
+            (body          (cdr def))
+            )
+       (let iter ((body  body)
+                  (count 0))
+         (cond
+          ((null? body) count)
+          ((pair? body) (iter (cdr body) (+ count 1)))
+          (else         `(+ ,count))))))))
 
 (define-syntax define-generic
   (syntax-rules ()

@@ -14,6 +14,7 @@
           define-method
           define-class
           define-primitive-class
+          call-next-method
           <number> <string> <symbol> <vector> <pair> <null>
           <class> <instance>
           <primitive-value> <primitive-class>

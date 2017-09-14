@@ -194,7 +194,7 @@
 ;; making instances
 
 (define-generic (allocate class))
-(define-generic (initialize obj))
+(define-generic (initialize obj . args))
 
 ;; allocate creates an instance of the class in question
 
