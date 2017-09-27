@@ -20,4 +20,5 @@
           <primitive-value> <primitive-class>
           make initialize allocate
           o-slot-ref o-slot-set!
+          class-of
 ))
