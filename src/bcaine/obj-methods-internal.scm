@@ -229,8 +229,22 @@
              (proc (generic-procedure-by-name name)))
     proc))
 
+(define (add-setter-to-wrapped-if-necessary proc func)
+  (let ((proc-name (generic-procedure-name proc)))
+    ;; if we're already dealing with a setter, just return the func as is
+    (if (not (symbol? proc-name))
+        func
+        (let ((existing-setter-proc
+               (generic-procedure-by-name (list 'setter proc-name))))
+          (if existing-setter-proc
+              (getter-with-setter
+               func
+               (wrap-generic-procedure existing-setter-proc))
+              func)))))
+
 (define (wrap-generic-procedure proc)
-  (let ((res (lambda args (apply-generic-procedure proc args))))
+  (let* ((res (lambda args (apply-generic-procedure proc args)))
+         (res (add-setter-to-wrapped-if-necessary proc res)))
     (add-generic-procedure! (generic-procedure-name proc) proc)
     (add-wrapped-generic-procedure! res (generic-procedure-name proc))
     res))
@@ -342,6 +356,18 @@
         (not
          (eq? (wrapped-generic-procedure-proc first)
               (wrapped-generic-procedure-proc second)))))
+
+    (wipe-all-methods!)
+
+    (test-assert
+        "if the original generic has a setter, a second generic for the same name should too"
+      (let* ((first (ensure-wrapped-generic-procedure 'bar 3))
+             (first-setter (ensure-wrapped-generic-procedure '(setter bar) 4))
+             (second (ensure-wrapped-generic-procedure 'bar 3)))
+        (equal?
+         '(setter bar)
+         (name-by-wrapped-generic-procedure (setter second)))))
+
     )
 
    (newline)))
