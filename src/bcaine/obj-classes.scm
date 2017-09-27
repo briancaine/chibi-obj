@@ -394,7 +394,8 @@
 
             ;; renames
             (r-begin        (rename 'begin))
-            (r-define       (rename 'define))
+            (r-define       (rename
+                             (if (template-testing?) 'mock-define 'define)))
             (r-create-class (rename 'create-class))
             (r-list         (rename 'list))
             (r-quote        (rename 'quote))
@@ -488,4 +489,7 @@
 (import (chibi test))
 
 (define (test-obj-classes)
-  #f)
+
+  (test-group "classes"
+              #f)
+)

@@ -311,4 +311,37 @@
 (import (chibi test))
 
 (define (test-obj-methods-internal)
-  #f)
+  (test-group
+   "methods-internal"
+
+   (test-group
+    "generic-procedure"
+
+    (wipe-all-methods!)
+
+    (test-assert
+        "ensure-wrapped-generic-procedure returns procedure"
+      (procedure? (ensure-wrapped-generic-procedure 'foo '(+ 3))))
+
+    (wipe-all-methods!)
+
+    (test-assert
+        "ensure-wrapped-generic-procedure returns same procedure twice"
+      (let* ((first  (ensure-wrapped-generic-procedure 'bar '(+ 3)))
+             (second (ensure-wrapped-generic-procedure 'bar '(+ 3))))
+        (eq? (wrapped-generic-procedure-proc first)
+             (wrapped-generic-procedure-proc second))))
+
+    (wipe-all-methods!)
+
+    (test-assert
+        "ensure-wrapped-generic-procedure returns different procedure after wiping"
+      (let* ((first  (ensure-wrapped-generic-procedure 'bar '(+ 3)))
+             (_      (wipe-all-methods!))
+             (second (ensure-wrapped-generic-procedure 'bar '(+ 3))))
+        (not
+         (eq? (wrapped-generic-procedure-proc first)
+              (wrapped-generic-procedure-proc second)))))
+    )
+
+   (newline)))
