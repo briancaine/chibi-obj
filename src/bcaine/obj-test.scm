@@ -42,8 +42,14 @@
      (name (make <animal>)))
 
     (test-assert
-     "able to initialize slot from make call"
-     (equal? (name (make <animal> 'name "Grouch")) "Grouch")))
+        "able to initialize slot from make call"
+      (equal? (name (make <animal> 'name "Grouch")) "Grouch"))
+
+    (test-assert
+        "able to assign to slots"
+      (let ((animal (make <animal>)))
+        (set! (name animal) "Flapper")
+        (equal? (name animal) "Flapper"))))
 
    (test-group
     "methods"

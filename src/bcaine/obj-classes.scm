@@ -191,6 +191,9 @@
   (let ((pair (find-slot obj slot-name)))
     (set! (cdr pair) value)))
 
+(define-method ((setter o-slot-ref) (obj <instance>) (slot-name #t) (value #t))
+  (o-slot-set! obj slot-name value))
+
 ;; making instances
 
 (define-generic (allocate class))
